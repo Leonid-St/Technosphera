@@ -1,0 +1,15 @@
+language: go
+
+go:
+  - 1.8
+
+before_install:
+  - go get github.com/constabulary/gb/...
+  - go get -u github.com/golang/lint/golint
+
+deploy:
+  provider: heroku
+  api_key:
+    secure: "JKH5PPnGKxTB1c8fQx9V5VgJZhtYgNrL47PBV5MXfqZcVeSxlWTx0c+whkSn/ZFPObZsaAi5JjoVAfWZEHydcYVVAST/SA74vxQrLrpPLxnx0Z7T4vh94o41vR6t0yWojQfxS2RW2o1hWf7W/X1poOQUw0CnLRILC8+cd+wLPucWNjq5C0kxBwPVrswSAEw2pUyHKtqMcN83TGA68yZkfCNFn41UTyr3GQVllwWVcGmuqq2j00tvNwKjGc3H1EDRw0EDtgzGPmuCDfyh9xrtQfDdmAn2M98ZMpq1l9OwOatDNY7oKv9Yejpt9nlPlvPgdls3g1nrnBLw8UamqHy0o0JGuYHMhZoSknHUuSwakFPdZgIaIIdFH95VzuyYd2EZIwS4/uKL/Xli0MA6xddEbSBk36Iiq1pOC/4WnNSjvj+3rlMh7yOojNQGHljeTi2ZmDyd8PWmV9X3pATkJjkprIxj3ZgRZ9tPJ+BlH5N22QVRQeTawFR+H0YP5GbqQV/4ow0zQxWPYCb+neFkdztV28aH0EUlnFc/lTWFBBoUhAeoV/OSkC8glILyUUK1XqQFPOnHceRJw3lXxOFWC1mZvCDU2VJnCfoeMkVGpLK2Xt+n45JI5017c2cDajqTrAqnNgEcbespTc/M0Asq+aqLCIF4f5yKKzKMZGTjZWjJi1A="
+  app: msu-go-2017
+  skip_cleanup: true
