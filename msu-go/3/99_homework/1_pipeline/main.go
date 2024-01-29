@@ -32,6 +32,10 @@ func main() {
 
 }
 
+func OriginalPipe(funcs ...job) {
+	return
+}
+
 // errType is the type of error interface.
 var errType = reflect.TypeOf((*error)(nil)).Elem()
 
