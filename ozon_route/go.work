@@ -1,0 +1,7 @@
+go 1.21.6
+
+use (
+	.
+	./1_SeaBattle
+	./2_DateCheck
+)

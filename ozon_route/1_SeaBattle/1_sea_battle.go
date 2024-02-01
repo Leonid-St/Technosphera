@@ -1,4 +1,4 @@
-package main
+package SeaBattle
 
 import (
 	"bufio"
@@ -15,22 +15,13 @@ type NumOfEachShips struct {
 	numOf1 int
 }
 
-func main() {
+func SeaBattle() {
 	var numOfLine int
 	scanner := bufio.NewScanner(os.Stdin)
 	max4 := 1
 	max3 := 2
 	max2 := 3
 	max1 := 4
-	// mm := map[int]string{}
-
-	// mm[1] = "2 1 3 1 2 3 1 1 4 2"
-	// mm[2] = "1 1 1 2 2 2 3 3 3 4"
-	// mm[3] = "1 1 1 1 2 2 2 3 3 4"
-	// mm[4] = "4 3 3 2 2 2 1 1 1 1"
-	// mm[5] = "4 4 4 4 4 4 4 4 4 4"
-
-	//fmt.Scanf("%d\n", &numOfLine)
 	scanner.Scan()
 	numOfLineStr := scanner.Text()
 	numOfLine, err := strconv.Atoi(numOfLineStr)
@@ -41,7 +32,7 @@ func main() {
 	i := 0
 	answers := make([]string, numOfLine)
 	for ; i < numOfLine; i++ {
-		var lineShips string //= mm[i+1]
+		var lineShips string
 		scanner.Scan()
 		lineShips = scanner.Text()
 		var numOfEachShips NumOfEachShips
