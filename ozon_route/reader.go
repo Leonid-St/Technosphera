@@ -14,60 +14,71 @@ func GetInputValue(
 	inputValueStart chan bool,
 	die chan bool,
 	pathTest string,
-	cmd *exec.Cmd) (output chan bool, buffer []byte) {
-	output = make(chan bool)
+	cmd *exec.Cmd) ( buffer chan []byte) {
+	buffer = make(chan []byte)
 	go func() {
 		for {
 			select {
-			case <-inputValueStart:
+
+				case msg := <-inputValueStart:
+				fmt.Println("msg := <-inputValueStart , msg := ", msg)
+				if msg {
+
 				b, err := os.ReadFile(pathTest)
 				if err != nil {
 					log.Print(err)
 				}
-				fmt.Println(string(b))
-				buffer = make([]byte, len(b))
-				for i := range b {
-					buffer[i] = b[i]
+				fmt.Println("fmt.Println(string(b))",string(b))
+				buffer <- b
 				}
-				// time.Sleep(time.Second * 2)
-				// fmt.Println(cmd.Stdout.Write(b))
-				output <- true
-			case <-die:
+				case <-die:
 				fmt.Println("read done")
 				wg.Done()
-				return
+				close(die)
+				return 	
 			}
+			
+		}
+			
+				
 			//fmt.Println(string(dataStdIn[:n]))
 
 			//stdin.Write(dataStdIn[:n])
 			//fmt.Println(string(dataStdIn[:n]))
-		}
 
 	}()
-	return output, buffer
+	return  buffer
 }
 
 func uploadValue(
 	wg *sync.WaitGroup,
-	die chan bool,
 	uploadValueStart chan bool,
+	die chan bool,
 	inputValueBuffer *[]byte,
-	cmd *exec.Cmd) <-chan bool {
-	output := make(chan bool)
+	cmd *exec.Cmd) <-chan string {
+	output := make(chan string)
 	go func() {
 		for {
 			select {
-			case <-uploadValueStart:
-				a := []byte("Hello from test program:- value1")
+			case msg :=   <-uploadValueStart:
+	fmt.Println("msg := <-uploadValueStart , msg := ", msg)
+	if msg {
+		a := []byte("Hello from test program:- value1")
 				*inputValueBuffer = append(*inputValueBuffer, a...)
-				//cmd.Stdout.Write(*inputValueBuffer)
-			case <-die:
-				fmt.Println("uploadInputBuffer done")
+				// n,err := cmd.Stdout.Write(*inputValueBuffer)
+				// if err!= nil {
+            //    fmt.Println(err)
+            // }
+				// fmt.Println("upload,:",n)
+				output <- "uploaded file"
+	}
+	case <-die:
+		fmt.Println("uploadInputBuffer done")
 				wg.Done()
+				close(die)
 				return
 			}
 		}
-
 	}()
 	return output
 }
@@ -80,21 +91,23 @@ func downloadValue(
 	cmd *exec.Cmd) <-chan bool {
 	output := make(chan bool)
 	go func() {
-		for {
-			select {
-			case <-downloadValueStart:
-				n, err := cmd.Stdin.Read(*dataStdOut)
+		for
+		{
+msg:= <-downloadValueStart 
+	fmt.Println("msg := <-downloadValueStart , msg := ", msg)
+	if msg {
+			n, err := cmd.Stdin.Read(*dataStdOut)
 				if err != nil {
 					fmt.Println(err.Error())
 					fmt.Println("n:", n)
-					fmt.Println("dataStdOut", string((*dataStdOut)[:n]))
-				}
-			case <-die:
-				fmt.Println("download done")
+					fmt.Println("dataStdOut", string((*dataStdOut)[:n]))	
+					fmt.Println("download done")
 				wg.Done()
 				return
-			}
+	}
 		}
+		}
+	
 
 	}()
 	return output
@@ -119,50 +132,47 @@ func Reader(pathProgram string, pathTest string) {
 	die2 := make(chan bool)
 	die3 := make(chan bool)
 
-	readDone, buffer := GetInputValue(&wg, readInputValueStart, die1, pathTest, cmd)
-
+	buffer := GetInputValue(&wg, readInputValueStart, die1, pathTest, cmd)
 	readInputValueStart <- true
-
-Loop1:
-	for {
-		select {
-		case <-readDone:
+	var b []byte 
+//Loop1:
+	// for {
+	// 	select {
+	// 	case <-readDone:
 			time.Sleep(time.Second * 1)
+			bytes := <- buffer
+			fmt.Println(bytes," - ",string(bytes))
+			b = make([]byte, len(bytes))
+			copy(b,bytes)
+			fmt.Println(b," - ",string(b))
 			die1 <- true
-			break Loop1
-		}
-	}
 
-	fmt.Println("Loop1 is break  - inputValueBuffer - ", string(buffer))
+			//break Loop1
+	// 	}
+	// }
 
-	uploadInputBufferDone := uploadValue(&wg, uploadValueStart, die1, &inputValueBuffer, cmd)
+	fmt.Println("  - buffer from file- ", string(b))
+
+	uploadInputBufferDone := uploadValue(&wg, uploadValueStart, die2, &inputValueBuffer, cmd)
 
 	uploadValueStart <- true
 
-Loop2:
-	for {
-		select {
-		case <-uploadInputBufferDone:
-			time.Sleep(time.Second * 1)
-			die2 <- true
-			break Loop2
-		}
-	}
-	fmt.Println("Loop2 is break  ")
 
+		 msg:= <-uploadInputBufferDone
+
+			fmt.Println("153",msg)
+	fmt.Println("  inputValueBuffer: ",&inputValueBuffer)
+	time.Sleep(time.Second * 1)
+	die2 <- true
+	
 	downloadValueBufferDone := downloadValue(&wg, downloadValueStart, die3, &dataStdOut, cmd)
 
 	downloadValueStart <- true
-Loop3:
-	for {
-		select {
-		case <-downloadValueBufferDone:
+	fmt.Println("fmt.Println( )<-downloadValueBufferDone", <-downloadValueBufferDone)
 			die3 <- true
-			break Loop3
-		}
-	}
+			
 
-	fmt.Println("Loop3 is break, dataStdOut -:", string(dataStdOut))
+	fmt.Println(" dataStdOut -:", string(dataStdOut))
 
 	wg.Wait()
 
