@@ -1,4 +1,4 @@
-package SeaBattle
+package main
 
 import (
 	"bufio"
@@ -15,7 +15,7 @@ type NumOfEachShips struct {
 	numOf1 int
 }
 
-func SeaBattle() {
+func main() {
 	var numOfLine int
 	scanner := bufio.NewScanner(os.Stdin)
 	max4 := 1
