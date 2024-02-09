@@ -1,17 +1,11 @@
 package main
 
-import (
-	"fmt"
-	"os"
-)
+import "fmt"
 
 func main() {
-	//SeaBattle.SeaBattle()
-	//GptReader("./1_SeaBattle/1_sea_battle.go", "./1_SeaBattle/tests/1","./1_SeaBattle/tests/1.a")
-	//Reader("./test_program/test_program.go", "./test_program/test_file")
-	//GptReader("./test_program/test_program.go", "./test_program/test_file", "./test_program/test_file.a")
-
-	fmt.Print("\n", "NEW TEST", "\n", "\n")
-	os.Stdout.Write([]byte("SUKA BLYAT\n"))
-	//GptReader("./1_SeaBattle/1_sea_battle", "./1_SeaBattle/tests/1", "./1_SeaBattle/tests/1.a")
+	for i := 1; i <= 15; i++ {
+		Reader("./1_SeaBattle/1_sea_battle.go",
+			fmt.Sprintf("./1_SeaBattle/tests/%d", i),
+			fmt.Sprintf("./1_SeaBattle/tests/%d.a", i))
+	}
 }
