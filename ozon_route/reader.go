@@ -34,9 +34,9 @@ func Reader(pathProgram string, pathInput string, pathOutput string) {
 		if err != nil {
 			if err == io.EOF {
 				//log.Print("EOF", " - ", oneByte, " - ", inputBuffer[len(inputBuffer)-1] == '\n', "\n")
-				if inputBuffer[len(inputBuffer)-1] == '\n' {
-					inputBuffer = inputBuffer[:len(inputBuffer)-1]
-				}
+				// if inputBuffer[len(inputBuffer)-1] == '\n' {
+				// 	inputBuffer = inputBuffer[:len(inputBuffer)-1]
+				// }
 			} else {
 				panic(" err != nil && err != io.EOF " + err.Error())
 			}
@@ -81,9 +81,9 @@ func Reader(pathProgram string, pathInput string, pathOutput string) {
 		str, err := readerOutput.ReadByte()
 		if err != nil {
 			if err == io.EOF {
-				if output[len(output)-1] == '\n' {
-					output = output[:len(output)-1]
-				}
+				// if output[len(output)-1] == '\n' {
+				// 	output = output[:len(output)-1]
+				// }
 				//log.Print("EOF", " - ", str, " - ", output[len(output)-1] == '\n', "\n")
 			} else {
 				panic(" err != nil && err != io.EOF " + err.Error())
@@ -115,7 +115,7 @@ func Reader(pathProgram string, pathInput string, pathOutput string) {
 	if err != nil {
 		panic("error cmd.Start()  " + err.Error())
 	}
-	var programAnswer []byte = make([]byte, 16384)
+	var programAnswer []byte = make([]byte, 524288)
 	n, err := writerToProgram.Write(append(inputBuffer, '\n'))
 	if err != nil {
 		panic("writerToProgram.Write" + err.Error())
@@ -125,7 +125,11 @@ func Reader(pathProgram string, pathInput string, pathOutput string) {
 	//	for {
 	bytes, err := readerFromProgram.Read(programAnswer) //ReadBytes('\n')
 	if err != nil {
-		panic("readerFromProgram.Read" + err.Error())
+		if err == io.EOF {
+
+		} else {
+			panic("readerFromProgram.Read" + err.Error())
+		}
 	}
 	fmt.Println("Read", bytes, "bytes")
 	// 	if err != nil {
@@ -141,14 +145,16 @@ func Reader(pathProgram string, pathInput string, pathOutput string) {
 	// 	}
 	// }
 	var realAnswer = make([]byte, bytes)
+	//fmt.Println("programAnswer", programAnswer)
 	copy(realAnswer, programAnswer[:bytes])
-	if string(realAnswer[:len(realAnswer)-1]) == output {
+	//fmt.Println("realAnswer", realAnswer)
+	if string(realAnswer) == output { //realAnswer[:len(realAnswer)-1]
 		fmt.Println("Test passed")
 	} else {
 		ts := TestCase{
-			input:          input,
-			expectedOutput: output,
-		}
+			input:             input,
+			expectedOutput:    output,
+			answerFromProgram: string(realAnswer)}
 		LogTestCase(ts)
 		fmt.Println("Test failed")
 	}
